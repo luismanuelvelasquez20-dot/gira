@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Valentina Restrepo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;600&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #111; 
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
+        #main-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        #canvas-container {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            transition: transform 2s ease-in-out;
+            z-index: 1;
+        }
+
+        /* Movimiento hacia la izquierda */
+        #canvas-container.shift {
+            transform: translateX(-22vw);
+        }
+
+        @media (max-width: 768px) {
+            #canvas-container.shift {
+                transform: translateY(-28vh) scale(0.65);
+            }
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 25vh;
+            z-index: 10;
+        }
+
+        button {
+            background-color: #f1c40f;
+            color: #2c3e50;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.6);
+            transition: transform 0.3s;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); }
+            50% { transform: scale(1.05); box-shadow: 0 0 35px rgba(241, 196, 15, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(241, 196, 15, 0.6); }
+        }
+
+        #text-container {
+            position: absolute;
+            right: 5%;
+            width: 45vw;
+            opacity: 0;
+            transition: opacity 2s ease-in-out 1s; 
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #text-container.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            #text-container {
+                right: 0;
+                bottom: 2%;
+                width: 100vw;
+                text-align: center;
+                padding: 0 20px;
+                box-sizing: border-box;
+            }
+        }
+
+        .mensaje {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .mensaje {
+                font-size: 0.95rem;
+                text-align: center;
+            }
+        }
+
+        .highlight {
+            color: #f1c40f;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .firma-container {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .firma-container {
+                text-align: center;
+                margin-top: 15px;
+            }
+        }
+
+        .firma {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            color: #f1c40f;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-wrapper">
+        <div id="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+        <div id="ui-layer">
+            <button id="start-btn">Haz click aquí, Valentina</button>
+        </div>
+        
+        <div id="text-container">
+            <div class="mensaje">
+                Hola <span class="highlight">Valentina Restrepo</span>,<br><br>
+                Dicen que las cosas más hermosas de la vida crecen despacio, buscando siempre la luz del sol, justo como lo hacen los girasoles. Y al pensar en eso, fue inevitable acordarme de ti.<br><br>
+                Eres una persona muy bonita, y no solo por lo que se nota a simple vista, sino por esa vibra tan tuya que hace que cualquier día ordinario se sienta especial.<br><br>
+                Quería dejarte este pequeño detalle con una sola intención: intentar robarte esa sonrisa increíble que tienes. Porque, si te soy sincero, verte sonreír ilumina muchísimo más que un campo entero de girasoles en pleno mediodía.<br><br>
+                Nunca pierdas esa esencia tan linda ni esa luz que te hace ser única. Sigue brillando, que el mundo se ve mucho mejor cuando tú estás feliz.
+            </div>
+            <div class="firma-container">
+                <div class="firma">Con mucho cariño,<br>yo.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('start-btn');
+        const uiLayer = document.getElementById('ui-layer');
+
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+        canvas.width = cw;
+        canvas.height = ch;
+
+        window.addEventListener('resize', () => {
+            cw = window.innerWidth;
+            ch = window.innerHeight;
+            canvas.width = cw;
+            canvas.height = ch;
+        });
+
+        function drawFlower(x, y, s) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(s, s);
+
+            // Pétalos
+            ctx.fillStyle = "#ffcc00";
+            for (let i = 0; i < 16; i++) {
+                ctx.rotate((Math.PI * 2) / 16);
+                ctx.beginPath();
+                ctx.ellipse(0, 15, 5, 22, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Centro
+            ctx.fillStyle = "#5c3a21";
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#3d2616";
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        let state = 0;
+        let flowerY = ch - 180;
+        let stemHeight = 0;
+        let treePoints = [];
+        let drawnPoints = 0;
+        let scale = Math.min(cw, ch) / 45;
+        let offsetY = ch / 2 - 20;
+        let stemEndY = offsetY; 
+
+        // Generamos los puntos para el ÁRBOL
+        function generateTreePoints() {
+            scale = Math.min(cw, ch) / 40; 
+            offsetY = ch / 2 - 20; 
+            stemEndY = offsetY; 
+
+            // Copa del árbol
+            let c = scale * 2.2;
+            for (let i = 1; i <= 75; i++) {
+                let a = i * 2.39996; 
+                let r = c * Math.sqrt(i);
+                let x = r * Math.cos(a);
+                let y = r * Math.sin(a);
+                
+                treePoints.push({
+                    x: cw / 2 + x,
+                    y: stemEndY - (15 * scale) + y, 
+                    s: Math.random() * 0.4 + 0.3 
+                });
+            }
+
+            // Girasoles en las ramas
+            let branch1 = offsetY + (8 * scale);
+            let branch2 = offsetY + (15 * scale);
+            
+            for(let i=0; i<3; i++) { 
+                treePoints.push({
+                    x: cw / 2 - 80 + (Math.random()*15-7),
+                    y: branch2 - 50 + (Math.random()*15-7),
+                    s: Math.random() * 0.3 + 0.2
+                });
+            }
+            for(let i=0; i<3; i++) { 
+                treePoints.push({
+                    x: cw / 2 + 80 + (Math.random()*15-7),
+                    y: branch1 - 60 + (Math.random()*15-7),
+                    s: Math.random() * 0.3 + 0.2
+                });
+            }
+            
+            treePoints.sort(() => Math.random() - 0.5); 
+        }
+
+        function drawStem(endY) {
+            ctx.strokeStyle = "#2e8b57";
+            ctx.lineCap = "round";
+            
+            ctx.lineWidth = 10;
+            ctx.beginPath();
+            ctx.moveTo(cw / 2, ch + 50);
+            ctx.lineTo(cw / 2, endY);
+            ctx.stroke();
+
+            let branch1 = offsetY + (8 * scale);
+            let branch2 = offsetY + (15 * scale);
+
+            if (endY < branch2) {
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(cw / 2, branch2);
+                ctx.quadraticCurveTo(cw / 2 - 40, branch2 - 20, cw / 2 - 80, branch2 - 50);
+                ctx.stroke();
+            }
+            if (endY < branch1) {
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.moveTo(cw / 2, branch1);
+                ctx.quadraticCurveTo(cw / 2 + 40, branch1 - 20, cw / 2 + 80, branch1 - 60);
+                ctx.stroke();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, cw, ch);
+
+            if (state === 0) {
+                drawFlower(cw / 2, flowerY, 1.8);
+            }
+            else if (state === 1) {
+                flowerY += 4;
+                drawFlower(cw / 2, flowerY, 1.8);
+                if (flowerY > ch + 100) {
+                    state = 2;
+                    generateTreePoints();
+                }
+            }
+            else if (state === 2) {
+                let currentY = ch + 50 - stemHeight;
+                drawStem(currentY);
+                stemHeight += 8; 
+
+                if (currentY <= stemEndY) {
+                    state = 3;
+                }
+            }
+            else if (state === 3) {
+                drawStem(stemEndY);
+
+                for (let i = 0; i < drawnPoints; i++) {
+                    let p = treePoints[i];
+                    drawFlower(p.x, p.y, p.s);
+                }
+
+                drawnPoints += 3; 
+                if (drawnPoints >= treePoints.length) {
+                    drawnPoints = treePoints.length;
+                    state = 4;
+                    document.getElementById('canvas-container').classList.add('shift');
+                    document.getElementById('text-container').classList.add('show');
+                }
+            }
+            else if (state === 4) {
+                drawStem(stemEndY);
+                for (let i = 0; i < treePoints.length; i++) {
+                    let p = treePoints[i];
+                    drawFlower(p.x, p.y, p.s);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        btn.addEventListener('click', () => {
+            uiLayer.style.display = 'none'; 
+            state = 1; 
+        });
+
+        animate();
+    </script>
+</body>
+</html>
